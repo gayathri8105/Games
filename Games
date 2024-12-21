@@ -1189,3 +1189,222 @@ public class AttendanceManagementSystem {
         }
     }
 }
+
+
+
+
+
+//Library Management System
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Book {
+    int id;
+    String title;
+    String author;
+    boolean isAvailable;
+
+    public Book(int id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true;
+    }
+
+    public void issueBook() {
+        if (isAvailable) {
+            isAvailable = false;
+            System.out.println("Book '" + title + "' has been issued.");
+        } else {
+            System.out.println("Book '" + title + "' is currently unavailable.");
+        }
+    }
+
+    public void returnBook() {
+        isAvailable = true;
+        System.out.println("Book '" + title + "' has been returned.");
+    }
+
+    public void displayBookInfo() {
+        System.out.println("ID: " + id + ", Title: " + title + ", Author: " + author + ", Available: " + (isAvailable ? "Yes" : "No"));
+    }
+}
+
+class Member {
+    int memberId;
+    String name;
+    ArrayList<Book> borrowedBooks;
+
+    public Member(int memberId, String name) {
+        this.memberId = memberId;
+        this.name = name;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public void borrowBook(Book book) {
+        if (book.isAvailable) {
+            borrowedBooks.add(book);
+            book.issueBook();
+        } else {
+            System.out.println("Sorry, the book is currently unavailable.");
+        }
+    }
+
+    public void returnBook(Book book) {
+        if (borrowedBooks.contains(book)) {
+            borrowedBooks.remove(book);
+            book.returnBook();
+        } else {
+            System.out.println("This book was not borrowed by you.");
+        }
+    }
+
+    public void showBorrowedBooks() {
+        System.out.println("Books borrowed by " + name + ":");
+        for (Book book : borrowedBooks) {
+            System.out.println(book.title);
+        }
+    }
+}
+
+public class LibraryManagementSystem {
+    private static ArrayList<Book> books = new ArrayList<>();
+    private static ArrayList<Member> members = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\nLibrary Management System");
+            System.out.println("1. Add Book");
+            System.out.println("2. Register Member");
+            System.out.println("3. Issue Book");
+            System.out.println("4. Return Book");
+            System.out.println("5. View All Books");
+            System.out.println("6. View Borrowed Books");
+            System.out.println("7. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
+
+            switch (choice) {
+                case 1:
+                    addBook();
+                    break;
+                case 2:
+                    registerMember();
+                    break;
+                case 3:
+                    issueBook();
+                    break;
+                case 4:
+                    returnBook();
+                    break;
+                case 5:
+                    viewAllBooks();
+                    break;
+                case 6:
+                    viewBorrowedBooks();
+                    break;
+                case 7:
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void addBook() {
+        System.out.print("Enter Book ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();  // Consume newline
+        System.out.print("Enter Book Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter Book Author: ");
+        String author = scanner.nextLine();
+
+        books.add(new Book(id, title, author));
+        System.out.println("Book added successfully!");
+    }
+
+    private static void registerMember() {
+        System.out.print("Enter Member ID: ");
+        int memberId = scanner.nextInt();
+        scanner.nextLine();  // Consume newline
+        System.out.print("Enter Member Name: ");
+        String name = scanner.nextLine();
+
+        members.add(new Member(memberId, name));
+        System.out.println("Member registered successfully!");
+    }
+
+    private static void issueBook() {
+        System.out.print("Enter Member ID: ");
+        int memberId = scanner.nextInt();
+        System.out.print("Enter Book ID: ");
+        int bookId = scanner.nextInt();
+
+        Member member = findMemberById(memberId);
+        Book book = findBookById(bookId);
+
+        if (member != null && book != null) {
+            member.borrowBook(book);
+        } else {
+            System.out.println("Invalid Member ID or Book ID.");
+        }
+    }
+
+    private static void returnBook() {
+        System.out.print("Enter Member ID: ");
+        int memberId = scanner.nextInt();
+        System.out.print("Enter Book ID: ");
+        int bookId = scanner.nextInt();
+
+        Member member = findMemberById(memberId);
+        Book book = findBookById(bookId);
+
+        if (member != null && book != null) {
+            member.returnBook(book);
+        } else {
+            System.out.println("Invalid Member ID or Book ID.");
+        }
+    }
+
+    private static void viewAllBooks() {
+        System.out.println("All Books in the Library:");
+        for (Book book : books) {
+            book.displayBookInfo();
+        }
+    }
+
+    private static void viewBorrowedBooks() {
+        System.out.print("Enter Member ID: ");
+        int memberId = scanner.nextInt();
+
+        Member member = findMemberById(memberId);
+
+        if (member != null) {
+            member.showBorrowedBooks();
+        } else {
+            System.out.println("Invalid Member ID.");
+        }
+    }
+
+    private static Member findMemberById(int memberId) {
+        for (Member member : members) {
+            if (member.memberId == memberId) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    private static Book findBookById(int bookId) {
+        for (Book book : books) {
+            if (book.id == bookId) {
+                return book;
+            }
+        }
+        return null;
+    }
+}
