@@ -1,0 +1,1077 @@
+//Tic tac toe
+import java.util.Scanner;
+
+public class TicTacToe {
+
+    private static char[][] board;
+    private static final int SIZE = 3;
+    private static final char EMPTY = '-';
+    private static char currentPlayer;
+
+    public static void main(String[] args) {
+        initializeBoard();
+        currentPlayer = 'X';
+        boolean gameWon = false;
+
+        System.out.println("Welcome to Tic Tac Toe!");
+        printBoard();
+
+        while (!isBoardFull() && !gameWon) {
+            playerMove();
+            printBoard();
+            gameWon = checkWin();
+
+            if (!gameWon) {
+                switchPlayer();
+            }
+        }
+
+        if (gameWon) {
+            System.out.println("Player " + currentPlayer + " wins!");
+        } else {
+            System.out.println("It's a draw!");
+        }
+    }
+
+    private static void initializeBoard() {
+        board = new char[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = EMPTY;
+            }
+        }
+    }
+
+    private static void printBoard() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private static void playerMove() {
+        Scanner scanner = new Scanner(System.in);
+        int row, col;
+
+        while (true) {
+            System.out.println("Player " + currentPlayer + ", enter your move (row and column): ");
+            row = scanner.nextInt() - 1;
+            col = scanner.nextInt() - 1;
+
+            if (row >= 0 && row < SIZE && col >= 0 && col < SIZE && board[row][col] == EMPTY) {
+                board[row][col] = currentPlayer;
+                break;
+            } else {
+                System.out.println("This move is not valid.");
+            }
+        }
+    }
+
+    private static boolean isBoardFull() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean checkWin() {
+        // Check rows and columns
+        for (int i = 0; i < SIZE; i++) {
+            if ((board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) ||
+                (board[0][i] == currentPlayer && board[1][i] == currentPlayer && board[2][i] == currentPlayer)) {
+                return true;
+            }
+        }
+
+        // Check diagonals
+        if ((board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) ||
+            (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+}
+
+
+
+
+
+//Suduko Game
+import java.util.Scanner;
+
+public class SudokuSolver {
+
+    private static final int SIZE = 9;
+    private static final int EMPTY = 0;
+
+    public static void main(String[] args) {
+        int[][] board = new int[SIZE][SIZE];
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the Sudoku puzzle row by row (use 0 for empty cells):");
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = scanner.nextInt();
+            }
+        }
+
+        System.out.println("Original Sudoku:");
+        printBoard(board);
+
+        if (solveSudoku(board)) {
+            System.out.println("Solved Sudoku:");
+            printBoard(board);
+        } else {
+            System.out.println("This Sudoku puzzle cannot be solved.");
+        }
+    }
+
+    private static boolean solveSudoku(int[][] board) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (board[row][col] == EMPTY) {
+                    for (int num = 1; num <= SIZE; num++) {
+                        if (isSafe(board, row, col, num)) {
+                            board[row][col] = num;
+
+                            if (solveSudoku(board)) {
+                                return true;
+                            }
+
+                            board[row][col] = EMPTY; // Backtrack
+                        }
+                    }
+                    return false; // No valid number found
+                }
+            }
+        }
+        return true; // All cells are filled
+    }
+
+    private static boolean isSafe(int[][] board, int row, int col, int num) {
+        // Check row
+        for (int x = 0; x < SIZE; x++) {
+            if (board[row][x] == num) {
+                return false;
+            }
+        }
+
+        // Check column
+        for (int x = 0; x < SIZE; x++) {
+            if (board[x][col] == num) {
+                return false;
+            }
+        }
+
+        // Check 3x3 subgrid
+        int startRow = row - row % 3;
+        int startCol = col - col % 3;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[startRow + i][startCol + j] == num) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static void printBoard(int[][] board) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
+
+
+
+
+
+//Number Guessing game
+import java.util.Random;
+import java.util.Scanner;
+
+public class NumberGuessingGame {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+
+        int numberToGuess = random.nextInt(100) + 1; // Random number between 1 and 100
+        int attempts = 0;
+        int guess = 0;
+
+        System.out.println("Welcome to the Number Guessing Game!");
+        System.out.println("I have chosen a number between 1 and 100. Can you guess it?");
+
+        while (guess != numberToGuess) {
+            System.out.print("Enter your guess: ");
+            guess = scanner.nextInt();
+            attempts++;
+
+            if (guess < numberToGuess) {
+                System.out.println("Too low! Try again.");
+            } else if (guess > numberToGuess) {
+                System.out.println("Too high! Try again.");
+            } else {
+                System.out.println("Congratulations! You guessed the number in " + attempts + " attempts.");
+            }
+        }
+
+        System.out.println("Thanks for playing the Number Guessing Game!");
+    }
+}
+
+
+
+
+
+//Snake game
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Random;
+
+public class SnakeGame extends JFrame {
+    public SnakeGame() {
+        add(new GamePanel());
+        setResizable(false);
+        pack();
+        setTitle("Snake Game");
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            JFrame frame = new SnakeGame();
+            frame.setVisible(true);
+        });
+    }
+}
+
+class GamePanel extends JPanel implements ActionListener {
+    private static final int TILE_SIZE = 25;
+    private static final int WIDTH = 30; // Number of tiles horizontally
+    private static final int HEIGHT = 20; // Number of tiles vertically
+    private static final int DELAY = 150; // Delay in milliseconds
+
+    private final Timer timer;
+    private final ArrayList<Point> snake;
+    private Point food;
+    private int direction;
+    private boolean running;
+
+    private static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
+
+    public GamePanel() {
+        setPreferredSize(new Dimension(WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
+        setBackground(Color.BLACK);
+        setFocusable(true);
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int key = e.getKeyCode();
+                if (key == KeyEvent.VK_UP && direction != DOWN) direction = UP;
+                if (key == KeyEvent.VK_DOWN && direction != UP) direction = DOWN;
+                if (key == KeyEvent.VK_LEFT && direction != RIGHT) direction = LEFT;
+                if (key == KeyEvent.VK_RIGHT && direction != LEFT) direction = RIGHT;
+            }
+        });
+
+        snake = new ArrayList<>();
+        timer = new Timer(DELAY, this);
+        startGame();
+    }
+
+    private void startGame() {
+        snake.clear();
+        snake.add(new Point(WIDTH / 2, HEIGHT / 2));
+        direction = RIGHT;
+        spawnFood();
+        running = true;
+        timer.start();
+    }
+
+    private void spawnFood() {
+        Random random = new Random();
+        food = new Point(random.nextInt(WIDTH), random.nextInt(HEIGHT));
+        while (snake.contains(food)) {
+            food = new Point(random.nextInt(WIDTH), random.nextInt(HEIGHT));
+        }
+    }
+
+    private void moveSnake() {
+        Point head = snake.get(0);
+        Point newHead = new Point(head);
+
+        switch (direction) {
+            case UP -> newHead.y--;
+            case DOWN -> newHead.y++;
+            case LEFT -> newHead.x--;
+            case RIGHT -> newHead.x++;
+        }
+
+        if (newHead.equals(food)) {
+            snake.add(0, food);
+            spawnFood();
+        } else {
+            snake.add(0, newHead);
+            snake.remove(snake.size() - 1);
+        }
+
+        if (newHead.x < 0 || newHead.x >= WIDTH || newHead.y < 0 || newHead.y >= HEIGHT || snake.subList(1, snake.size()).contains(newHead)) {
+            running = false;
+            timer.stop();
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (running) {
+            moveSnake();
+        }
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        if (running) {
+            g.setColor(Color.RED);
+            g.fillRect(food.x * TILE_SIZE, food.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+
+            g.setColor(Color.GREEN);
+            for (Point p : snake) {
+                g.fillRect(p.x * TILE_SIZE, p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
+        } else {
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            String message = "Game Over! Press R to Restart.";
+            g.drawString(message, getWidth() / 2 - g.getFontMetrics().stringWidth(message) / 2, getHeight() / 2);
+
+            addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_R) {
+                        startGame();
+                        repaint();
+                    }
+                }
+            });
+        }
+    }
+}
+
+
+
+
+
+//Chess game
+import java.util.Scanner;
+
+public class ChessGame {
+    private static final int SIZE = 8;
+    private static final String[][] board = new String[SIZE][SIZE];
+
+    public static void main(String[] args) {
+        initializeBoard();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to Chess! Use algebraic notation to move pieces (e.g., e2 e4).");
+        while (true) {
+            printBoard();
+            System.out.print("Enter your move (or 'exit' to quit): ");
+            String input = scanner.nextLine();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Thanks for playing!");
+                break;
+            }
+
+            String[] move = input.split(" ");
+            if (move.length != 2 || !isValidMove(move[0], move[1])) {
+                System.out.println("Invalid move! Try again.");
+                continue;
+            }
+
+            makeMove(move[0], move[1]);
+        }
+
+        scanner.close();
+    }
+
+    private static void initializeBoard() {
+        // Initialize empty spaces
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = " ";
+            }
+        }
+
+        // Set pawns
+        for (int i = 0; i < SIZE; i++) {
+            board[1][i] = "P"; // White pawns
+            board[6][i] = "p"; // Black pawns
+        }
+
+        // Set other pieces
+        String[] whitePieces = {"R", "N", "B", "Q", "K", "B", "N", "R"};
+        String[] blackPieces = {"r", "n", "b", "q", "k", "b", "n", "r"};
+
+        System.arraycopy(whitePieces, 0, board[0], 0, SIZE);
+        System.arraycopy(blackPieces, 0, board[7], 0, SIZE);
+    }
+
+    private static void printBoard() {
+        System.out.println("  a b c d e f g h");
+        for (int i = 0; i < SIZE; i++) {
+            System.out.print((8 - i) + " ");
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println((8 - i));
+        }
+        System.out.println("  a b c d e f g h");
+    }
+
+    private static boolean isValidMove(String from, String to) {
+        int[] fromPos = parsePosition(from);
+        int[] toPos = parsePosition(to);
+
+        if (fromPos == null || toPos == null) {
+            return false; // Invalid positions
+        }
+
+        String piece = board[fromPos[0]][fromPos[1]];
+        if (piece.equals(" ")) {
+            return false; // No piece to move
+        }
+
+        return true; // For simplicity, assume all moves are valid
+    }
+
+    private static void makeMove(String from, String to) {
+        int[] fromPos = parsePosition(from);
+        int[] toPos = parsePosition(to);
+
+        board[toPos[0]][toPos[1]] = board[fromPos[0]][fromPos[1]];
+        board[fromPos[0]][fromPos[1]] = " ";
+    }
+
+    private static int[] parsePosition(String pos) {
+        if (pos.length() != 2) {
+            return null;
+        }
+
+        char file = pos.charAt(0); // Column (a-h)
+        char rank = pos.charAt(1); // Row (1-8)
+
+        int col = file - 'a';
+        int row = '8' - rank;
+
+        if (col < 0 || col >= SIZE || row < 0 || row >= SIZE) {
+            return null;
+        }
+
+        return new int[]{row, col};
+    }
+}
+
+
+
+
+
+//Text based Adventure game
+import java.util.Scanner;
+
+public class TextAdventureGame {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to the Adventure Game!");
+        System.out.println("Your journey begins in a dark forest. You must choose your actions carefully to survive.");
+
+        String choice;
+
+        // Starting point
+        System.out.println("You find yourself at a crossroads. Do you want to go 'left', 'right', or 'straight'?");
+        choice = scanner.nextLine().toLowerCase();
+
+        if (choice.equals("left")) {
+            System.out.println("You encounter a wild wolf! Do you 'fight' or 'run'?");
+            choice = scanner.nextLine().toLowerCase();
+
+            if (choice.equals("fight")) {
+                System.out.println("You bravely fight the wolf and win, but you are injured. You continue your journey.");
+            } else if (choice.equals("run")) {
+                System.out.println("You manage to escape safely, but you lose your way in the forest.");
+            } else {
+                System.out.println("Unable to decide, the wolf attacks you. Game over.");
+                return;
+            }
+        } else if (choice.equals("right")) {
+            System.out.println("You discover an abandoned hut. Do you 'enter' or 'ignore' it?");
+            choice = scanner.nextLine().toLowerCase();
+
+            if (choice.equals("enter")) {
+                System.out.println("Inside the hut, you find a map and supplies. These will help you on your journey.");
+            } else if (choice.equals("ignore")) {
+                System.out.println("You walk past the hut and continue on your way, but you miss valuable supplies.");
+            } else {
+                System.out.println("Indecision costs you time, and night falls. You are lost in the darkness. Game over.");
+                return;
+            }
+        } else if (choice.equals("straight")) {
+            System.out.println("You reach a river. Do you 'swim' across or 'build' a raft?");
+            choice = scanner.nextLine().toLowerCase();
+
+            if (choice.equals("swim")) {
+                System.out.println("You swim across the river but lose some supplies. You reach the other side safely.");
+            } else if (choice.equals("build")) {
+                System.out.println("You build a raft and cross the river safely with all your supplies intact.");
+            } else {
+                System.out.println("You hesitate at the riverbank, and the current sweeps you away. Game over.");
+                return;
+            }
+        } else {
+            System.out.println("Unable to decide, you wander aimlessly in the forest. Game over.");
+            return;
+        }
+
+        // Ending point
+        System.out.println("After a long journey, you find a treasure chest. Do you 'open' it or 'leave' it?");
+        choice = scanner.nextLine().toLowerCase();
+
+        if (choice.equals("open")) {
+            System.out.println("You open the chest and find a wealth of gold and jewels. Congratulations, you win!");
+        } else if (choice.equals("leave")) {
+            System.out.println("You decide to leave the chest, valuing your life over riches. You safely exit the forest.");
+        } else {
+            System.out.println("Your hesitation causes you to lose the opportunity. Game over.");
+        }
+
+        System.out.println("Thank you for playing the Adventure Game!");
+        scanner.close();
+    }
+}
+
+
+
+
+//Flappy-Bird game
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Random;
+
+public class FlappyBird extends JFrame {
+    public FlappyBird() {
+        add(new GamePanel());
+        setTitle("Flappy Bird");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(FlappyBird::new);
+    }
+}
+
+class GamePanel extends JPanel implements ActionListener {
+    private static final int WIDTH = 400;
+    private static final int HEIGHT = 600;
+    private static final int GROUND_HEIGHT = 50;
+    private static final int PIPE_WIDTH = 50;
+    private static final int PIPE_GAP = 150;
+    private static final int BIRD_SIZE = 20;
+
+    private Timer timer;
+    private int birdX = 100;
+    private int birdY = HEIGHT / 2;
+    private int birdVelocity = 0;
+    private boolean running = true;
+
+    private final ArrayList<Rectangle> pipes = new ArrayList<>();
+    private Random random = new Random();
+
+    private int score = 0;
+
+    public GamePanel() {
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.CYAN);
+        setFocusable(true);
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    birdVelocity = -10;
+                }
+            }
+        });
+
+        timer = new Timer(20, this);
+        timer.start();
+        generatePipes();
+    }
+
+    private void generatePipes() {
+        for (int i = 0; i < 4; i++) {
+            int pipeHeight = random.nextInt(HEIGHT / 2);
+            int x = WIDTH + i * (PIPE_WIDTH + 100);
+            pipes.add(new Rectangle(x, 0, PIPE_WIDTH, pipeHeight));
+            pipes.add(new Rectangle(x, pipeHeight + PIPE_GAP, PIPE_WIDTH, HEIGHT - pipeHeight - PIPE_GAP - GROUND_HEIGHT));
+        }
+    }
+
+    private void movePipes() {
+        ArrayList<Rectangle> toRemove = new ArrayList<>();
+
+        for (Rectangle pipe : pipes) {
+            pipe.x -= 5;
+
+            if (pipe.x + PIPE_WIDTH < 0) {
+                toRemove.add(pipe);
+                if (pipe.y == 0) {
+                    int pipeHeight = random.nextInt(HEIGHT / 2);
+                    pipes.add(new Rectangle(WIDTH, 0, PIPE_WIDTH, pipeHeight));
+                    pipes.add(new Rectangle(WIDTH, pipeHeight + PIPE_GAP, PIPE_WIDTH, HEIGHT - pipeHeight - PIPE_GAP - GROUND_HEIGHT));
+                    score++;
+                }
+            }
+        }
+
+        pipes.removeAll(toRemove);
+    }
+
+    private void checkCollision() {
+        for (Rectangle pipe : pipes) {
+            if (pipe.intersects(new Rectangle(birdX, birdY, BIRD_SIZE, BIRD_SIZE))) {
+                running = false;
+                timer.stop();
+            }
+        }
+
+        if (birdY + BIRD_SIZE > HEIGHT - GROUND_HEIGHT || birdY < 0) {
+            running = false;
+            timer.stop();
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Draw bird
+        g.setColor(Color.YELLOW);
+        g.fillOval(birdX, birdY, BIRD_SIZE, BIRD_SIZE);
+
+        // Draw pipes
+        g.setColor(Color.GREEN);
+        for (Rectangle pipe : pipes) {
+            g.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
+        }
+
+        // Draw ground
+        g.setColor(Color.ORANGE);
+        g.fillRect(0, HEIGHT - GROUND_HEIGHT, WIDTH, GROUND_HEIGHT);
+
+        // Draw score
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Score: " + score, 10, 20);
+
+        // Game over message
+        if (!running) {
+            g.setFont(new Font("Arial", Font.BOLD, 40));
+            g.drawString("Game Over", WIDTH / 2 - 100, HEIGHT / 2);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (running) {
+            birdY += birdVelocity;
+            birdVelocity += 1;
+
+            movePipes();
+            checkCollision();
+        }
+
+        repaint();
+    }
+}
+
+
+
+
+
+//Super Mario Bros clone game
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+
+public class SuperMarioClone extends JFrame {
+    public SuperMarioClone() {
+        add(new GamePanel());
+        setTitle("Super Mario Clone");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(SuperMarioClone::new);
+    }
+}
+
+class GamePanel extends JPanel implements ActionListener {
+    private final int GROUND_Y = 500;
+    private final int MARIO_WIDTH = 40;
+    private final int MARIO_HEIGHT = 40;
+    private final Timer timer;
+
+    private int marioX = 100;
+    private int marioY = GROUND_Y - MARIO_HEIGHT;
+    private int marioVelocityX = 0;
+    private int marioVelocityY = 0;
+
+    private boolean onGround = true;
+
+    private final ArrayList<Rectangle> platforms = new ArrayList<>();
+
+    public GamePanel() {
+        setBackground(new Color(107, 191, 255)); // Sky blue background
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                handleKeyPress(e);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                handleKeyRelease(e);
+            }
+        });
+        setFocusable(true);
+
+        // Initialize platforms
+        platforms.add(new Rectangle(50, GROUND_Y, 800, 50)); // Ground
+        platforms.add(new Rectangle(200, 400, 100, 20)); // Platform 1
+        platforms.add(new Rectangle(350, 300, 150, 20)); // Platform 2
+        platforms.add(new Rectangle(600, 350, 100, 20)); // Platform 3
+
+        // Game loop timer
+        timer = new Timer(15, this);
+        timer.start();
+    }
+
+    private void handleKeyPress(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_LEFT -> marioVelocityX = -5;
+            case KeyEvent.VK_RIGHT -> marioVelocityX = 5;
+            case KeyEvent.VK_SPACE -> {
+                if (onGround) {
+                    marioVelocityY = -15;
+                    onGround = false;
+                }
+            }
+        }
+    }
+
+    private void handleKeyRelease(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT -> marioVelocityX = 0;
+        }
+    }
+
+    private void moveMario() {
+        marioX += marioVelocityX;
+        marioY += marioVelocityY;
+
+        // Apply gravity
+        if (!onGround) {
+            marioVelocityY += 1;
+        }
+
+        // Prevent Mario from leaving the screen
+        if (marioX < 0) marioX = 0;
+        if (marioX + MARIO_WIDTH > getWidth()) marioX = getWidth() - MARIO_WIDTH;
+
+        // Check collisions with platforms
+        onGround = false;
+        for (Rectangle platform : platforms) {
+            if (new Rectangle(marioX, marioY, MARIO_WIDTH, MARIO_HEIGHT).intersects(platform)) {
+                if (marioY + MARIO_HEIGHT - marioVelocityY <= platform.y) {
+                    marioY = platform.y - MARIO_HEIGHT; // Land on the platform
+                    marioVelocityY = 0;
+                    onGround = true;
+                }
+            }
+        }
+
+        // Prevent Mario from falling off the screen
+        if (marioY + MARIO_HEIGHT >= GROUND_Y) {
+            marioY = GROUND_Y - MARIO_HEIGHT;
+            onGround = true;
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Draw Mario
+        g.setColor(Color.RED);
+        g.fillRect(marioX, marioY, MARIO_WIDTH, MARIO_HEIGHT);
+
+        // Draw platforms
+        g.setColor(Color.GREEN);
+        for (Rectangle platform : platforms) {
+            g.fillRect(platform.x, platform.y, platform.width, platform.height);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        moveMario();
+        repaint();
+    }
+}
+
+
+
+
+
+//Brick Breaker Game
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+public class BrickBreaker extends JFrame {
+    public BrickBreaker() {
+        add(new GamePanel());
+        setTitle("Brick Breaker");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(BrickBreaker::new);
+    }
+}
+
+class GamePanel extends JPanel implements ActionListener {
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
+    private static final int PADDLE_WIDTH = 100;
+    private static final int PADDLE_HEIGHT = 10;
+    private static final int BALL_SIZE = 20;
+    private static final int ROWS = 5;
+    private static final int COLUMNS = 10;
+    private static final int BRICK_WIDTH = WIDTH / COLUMNS;
+    private static final int BRICK_HEIGHT = 20;
+
+    private Timer timer;
+    private int paddleX = WIDTH / 2 - PADDLE_WIDTH / 2;
+    private int ballX = WIDTH / 2;
+    private int ballY = HEIGHT / 2;
+    private int ballVelocityX = 2;
+    private int ballVelocityY = -2;
+    private boolean[][] bricks = new boolean[ROWS][COLUMNS];
+    private boolean running = true;
+
+    public GamePanel() {
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.BLACK);
+        setFocusable(true);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    paddleX -= 15;
+                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    paddleX += 15;
+                }
+            }
+        });
+
+        // Initialize bricks
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                bricks[i][j] = true;
+            }
+        }
+
+        timer = new Timer(10, this);
+        timer.start();
+    }
+
+    private void moveBall() {
+        ballX += ballVelocityX;
+        ballY += ballVelocityY;
+
+        // Wall collisions
+        if (ballX <= 0 || ballX + BALL_SIZE >= WIDTH) {
+            ballVelocityX = -ballVelocityX;
+        }
+        if (ballY <= 0) {
+            ballVelocityY = -ballVelocityY;
+        }
+
+        // Paddle collision
+        if (ballY + BALL_SIZE >= HEIGHT - PADDLE_HEIGHT && ballX + BALL_SIZE >= paddleX && ballX <= paddleX + PADDLE_WIDTH) {
+            ballVelocityY = -ballVelocityY;
+        }
+
+        // Brick collision
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                if (bricks[i][j]) {
+                    int brickX = j * BRICK_WIDTH;
+                    int brickY = i * BRICK_HEIGHT;
+                    Rectangle brickRect = new Rectangle(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
+                    Rectangle ballRect = new Rectangle(ballX, ballY, BALL_SIZE, BALL_SIZE);
+
+                    if (ballRect.intersects(brickRect)) {
+                        bricks[i][j] = false;
+                        ballVelocityY = -ballVelocityY;
+                    }
+                }
+            }
+        }
+
+        // Game over
+        if (ballY > HEIGHT) {
+            running = false;
+            timer.stop();
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Draw paddle
+        g.setColor(Color.GREEN);
+        g.fillRect(paddleX, HEIGHT - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+        // Draw ball
+        g.setColor(Color.WHITE);
+        g.fillOval(ballX, ballY, BALL_SIZE, BALL_SIZE);
+
+        // Draw bricks
+        g.setColor(Color.RED);
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                if (bricks[i][j]) {
+                    g.fillRect(j * BRICK_WIDTH, i * BRICK_HEIGHT, BRICK_WIDTH - 2, BRICK_HEIGHT - 2);
+                }
+            }
+        }
+
+        // Game over message
+        if (!running) {
+            g.setColor(Color.YELLOW);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            g.drawString("Game Over!", WIDTH / 2 - 100, HEIGHT / 2);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (running) {
+            moveBall();
+            repaint();
+        }
+    }
+}
+
+
+
+
+
+//Word Counter
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+
+public class WordCounter extends JFrame {
+    public WordCounter() {
+        setTitle("Word Counter");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 300);
+        setLocationRelativeTo(null);
+
+        JTextArea textArea = new JTextArea();
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        JButton countButton = new JButton("Count Words");
+        JLabel resultLabel = new JLabel("Words: 0, Characters: 0");
+
+        countButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textArea.getText();
+                int wordCount = text.trim().isEmpty() ? 0 : text.trim().split("\\s+").length;
+                int charCount = text.length();
+                resultLabel.setText("Words: " + wordCount + ", Characters: " + charCount);
+            }
+        });
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+        panel.add(countButton, BorderLayout.SOUTH);
+        panel.add(resultLabel, BorderLayout.NORTH);
+
+        add(panel);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(WordCounter::new);
+    }
+}
